@@ -1,13 +1,7 @@
 # Base image for Node.js MCP servers with FastMCP stdio->HTTP proxy
-FROM node:18-slim
+FROM pape-mcp-node-base
 
 WORKDIR /app
-
-# Install common system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
 
 # Install FastMCP globally (version 2.0.0+)
 RUN npm install -g fastmcp@^2.0.0

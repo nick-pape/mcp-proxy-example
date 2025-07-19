@@ -1,4 +1,4 @@
-FROM pape-mcp-node-base
+FROM pape-mcp-node-proxy
 
 WORKDIR /app
 

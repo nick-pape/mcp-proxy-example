@@ -9,20 +9,24 @@ services:
     environment:
       - HASS_URL=${HASS_URL}
       - HASS_TOKEN=${HASS_TOKEN}
+      - MCP_COMMAND=python -m hass_mcp
       - MCP_PORT=3001
+      - SERVICE_NAME=HomeAssistant MCP
     ports:
       - "3001:3001"
     networks:
       - mcp-network
 
-  # YNAB MCP (Already FastMCP HTTP-ready)
+  # YNAB MCP (Python stdio -> HTTP proxy)
   mcp-ynab:
     build:
       context: ./services/mcp-ynab
       dockerfile: Dockerfile
     environment:
       - YNAB_TOKEN=${YNAB_TOKEN}
+      - MCP_COMMAND=uv run ynab-mcp
       - MCP_PORT=3002
+      - SERVICE_NAME=YNAB MCP
     ports:
       - "3002:3002"
     networks:
@@ -72,7 +76,9 @@ services:
       context: ./services/mcp-calculator
       dockerfile: Dockerfile
     environment:
+      - MCP_COMMAND=uvx mcp-server-calculator
       - MCP_PORT=3006
+      - SERVICE_NAME=Calculator MCP
     ports:
       - "3006:3006"
     networks:

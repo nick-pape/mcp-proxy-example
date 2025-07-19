@@ -1,41 +1,44 @@
 #!/usr/bin/env python3
 """
-Generic FastMCP stdio->HTTP proxy for Python MCP servers
+Generic FastMCP STDIO->HTTP proxy
+Bridges any MCP server from STDIO transport to HTTP transport
 """
 import os
-import subprocess
-import asyncio
+import shlex
 from fastmcp import FastMCP
+from fastmcp.client.transports import StdioTransport
 
 # Get configuration from environment
-MCP_PORT = int(os.getenv('MCP_PORT', '3000'))
-MCP_COMMAND = os.getenv('MCP_COMMAND', 'python server.py')
-MCP_ARGS = os.getenv('MCP_ARGS', '').split() if os.getenv('MCP_ARGS') else []
-
-# Create FastMCP app
-mcp = FastMCP("Python MCP Proxy")
-
-@mcp.tool()
-def proxy_tool():
-    """Proxy tool that forwards to the stdio MCP server"""
-    pass
-
-def run_mcp_server():
-    """Run the actual MCP server as stdio process"""
-    cmd = MCP_COMMAND.split() + MCP_ARGS
-    return subprocess.Popen(
-        cmd,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
+MCP_COMMAND = os.getenv('MCP_COMMAND', 'echo "No MCP_COMMAND specified"')
+MCP_PORT = int(os.getenv('MCP_PORT', '8000'))
+SERVICE_NAME = os.getenv('SERVICE_NAME', 'MCP Service')
 
 if __name__ == "__main__":
-    # Start the FastMCP server with proxy to stdio
-    print(f"Starting Python MCP proxy on port {MCP_PORT}")
-    print(f"Proxying command: {MCP_COMMAND} {' '.join(MCP_ARGS)}")
+    print(f"Starting {SERVICE_NAME} HTTP proxy on port {MCP_PORT}", flush=True)
+    print(f"Proxying STDIO command: {MCP_COMMAND}", flush=True)
+    print(f"Environment check - MCP_COMMAND: {repr(MCP_COMMAND)}", flush=True)
+    print(f"Environment check - MCP_PORT: {MCP_PORT}", flush=True)
+    print(f"Environment check - SERVICE_NAME: {repr(SERVICE_NAME)}", flush=True)
     
-    # Note: This is a simplified version. Full implementation would use
-    # FastMCP's proxy functionality to forward requests to the stdio process
-    mcp.run(transport="http", host="0.0.0.0", port=MCP_PORT)
+    # Parse the command string into command and args
+    command_parts = shlex.split(MCP_COMMAND)
+    print(f"Parsed command parts: {command_parts}", flush=True)
+    
+    # Create a STDIO transport for the backend MCP server
+    backend_transport = StdioTransport(
+        command=command_parts[0],
+        args=command_parts[1:] if len(command_parts) > 1 else []
+    )
+    
+    # Create a FastMCP proxy that bridges STDIO->HTTP
+    proxy = FastMCP.as_proxy(
+        backend_transport,
+        name=f"{SERVICE_NAME} Proxy"
+    )
+    
+    # Run the proxy as an HTTP server
+    proxy.run(
+        transport="http",
+        host="0.0.0.0", 
+        port=MCP_PORT
+    )
