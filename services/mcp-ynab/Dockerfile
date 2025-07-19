@@ -1,17 +1,11 @@
-    FROM python:3.13-slim
+FROM pape-mcp-python-base
 
-    WORKDIR /app
+WORKDIR /app
 
-    # Install system dependencies including git
-    RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+# Install the YNAB MCP server (git, fastmcp, uvicorn already in base image)
+RUN pip install git+https://github.com/ntdef/ynab-mcp.git
 
-    # Install dependencies
-    RUN pip install fastmcp uvicorn
-
-    # Install the YNAB MCP server
-    RUN pip install git+https://github.com/ntdef/ynab-mcp.git
-
-    # Copy proxy script
+# Copy proxy script
 COPY proxy.py /app/proxy.py
 
 ENV MCP_COMMAND="uv run ynab-mcp"

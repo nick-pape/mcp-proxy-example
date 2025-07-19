@@ -1,11 +1,8 @@
-FROM python:3.11-slim
+FROM pape-mcp-python-base
 
 WORKDIR /app
 
-# Install dependencies
-RUN pip install fastmcp uvicorn requests
-
-# Copy our proxy configuration
+# Copy our proxy configuration (fastmcp, uvicorn, requests already in base image)
 COPY proxy.py /app/proxy.py
 
 ENV MCP_COMMAND="python proxy.py"

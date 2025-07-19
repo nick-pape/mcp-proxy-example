@@ -4,7 +4,7 @@
   "description": "FastMCP stdio->HTTP proxy for Node.js MCP servers",
   "main": "proxy.js",
   "dependencies": {
-    "fastmcp": "^0.1.0",
+    "fastmcp": "^2.0.0",
     "child_process": "^1.0.2"
   }
 }

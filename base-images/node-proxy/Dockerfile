@@ -3,8 +3,14 @@ FROM node:18-slim
 
 WORKDIR /app
 
-# Install FastMCP and dependencies
-RUN npm install -g fastmcp
+# Install common system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install FastMCP globally (version 2.0.0+)
+RUN npm install -g fastmcp@^2.0.0
 
 # Copy the stdio->HTTP proxy script
 COPY proxy.js /app/proxy.js
