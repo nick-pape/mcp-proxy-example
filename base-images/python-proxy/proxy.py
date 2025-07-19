@@ -6,7 +6,6 @@ import os
 import subprocess
 import asyncio
 from fastmcp import FastMCP
-import uvicorn
 
 # Get configuration from environment
 MCP_PORT = int(os.getenv('MCP_PORT', '3000'))
@@ -39,9 +38,4 @@ if __name__ == "__main__":
     
     # Note: This is a simplified version. Full implementation would use
     # FastMCP's proxy functionality to forward requests to the stdio process
-    uvicorn.run(
-        "proxy:mcp",
-        host="0.0.0.0",
-        port=MCP_PORT,
-        log_level="info"
-    )
+    mcp.run(transport="http", host="0.0.0.0", port=MCP_PORT)

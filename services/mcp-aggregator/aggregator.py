@@ -3,8 +3,9 @@
 FastMCP Aggregator - Combines multiple MCP servers
 """
 import os
-import uvicorn
 from fastmcp import FastMCP
+from starlette.requests import Request
+from starlette.responses import PlainTextResponse, JSONResponse
 
 # Get configuration from environment
 MCP_PORT = int(os.getenv('MCP_PORT', '3100'))
@@ -34,13 +35,24 @@ def list_available_servers():
         "endpoints": MCP_ENDPOINTS
     }
 
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request) -> PlainTextResponse:
+    """Health check endpoint"""
+    return PlainTextResponse("OK")
+
+@mcp.custom_route("/info", methods=["GET"])
+async def server_info(request: Request) -> JSONResponse:
+    """Server information endpoint"""
+    return JSONResponse({
+        "name": "MCP Aggregator",
+        "servers": list(MCP_ENDPOINTS.keys()),
+        "endpoints": MCP_ENDPOINTS,
+        "mcp_path": "/mcp/"
+    })
+
 if __name__ == "__main__":
     print(f"Starting MCP Aggregator on port {MCP_PORT}")
     print(f"Available MCP servers: {list(MCP_ENDPOINTS.keys())}")
     
-    uvicorn.run(
-        "aggregator:mcp",
-        host="0.0.0.0",
-        port=MCP_PORT,
-        log_level="info"
-    )
+    # Use mcp.run() with http transport for web service
+    mcp.run(transport="http", host="0.0.0.0", port=MCP_PORT)

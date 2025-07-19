@@ -6,7 +6,6 @@ import os
 import subprocess
 import asyncio
 from fastmcp import FastMCP
-import uvicorn
 
 MCP_PORT = int(os.getenv('MCP_PORT', '3001'))
 
@@ -18,9 +17,4 @@ mcp = FastMCP("HomeAssistant MCP")
 
 if __name__ == "__main__":
     print(f"Starting HomeAssistant MCP proxy on port {MCP_PORT}")
-    uvicorn.run(
-        "proxy:mcp",
-        host="0.0.0.0",
-        port=MCP_PORT,
-        log_level="info"
-    )
+    mcp.run(transport="http", host="0.0.0.0", port=MCP_PORT)

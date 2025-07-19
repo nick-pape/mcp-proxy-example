@@ -12,4 +12,4 @@ ENV PORT=8080
 
 EXPOSE 8080
 
-CMD ["uv", "run", "mcpo", "--port", "8080", "--api-key", "mcpo-secret", "--server-type", "sse", "--", "http://mcp-aggregator:3100"]
+CMD ["uv", "run", "mcpo", "--port", "8080", "--api-key", "mcpo-secret", "--server-type", "http", "--", "http://mcp-aggregator:3100/mcp/"]
