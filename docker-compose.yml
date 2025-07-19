@@ -1,0 +1,130 @@
+version: '3.8'
+
+services:
+  # HomeAssistant MCP (Python stdio -> HTTP proxy)
+  mcp-homeassistant:
+    build:
+      context: ./services/mcp-homeassistant
+      dockerfile: Dockerfile
+    environment:
+      - HASS_URL=${HASS_URL}
+      - HASS_TOKEN=${HASS_TOKEN}
+      - MCP_PORT=3001
+    ports:
+      - "3001:3001"
+    networks:
+      - mcp-network
+
+  # YNAB MCP (Already FastMCP HTTP-ready)
+  mcp-ynab:
+    build:
+      context: ./services/mcp-ynab
+      dockerfile: Dockerfile
+    environment:
+      - YNAB_TOKEN=${YNAB_TOKEN}
+      - MCP_PORT=3002
+    ports:
+      - "3002:3002"
+    networks:
+      - mcp-network
+
+  # Notion MCP (Python stdio -> HTTP proxy)
+  mcp-notion:
+    build:
+      context: ./services/mcp-notion
+      dockerfile: Dockerfile
+    environment:
+      - NOTION_TOKEN=${NOTION_TOKEN}
+      - MCP_PORT=3003
+    ports:
+      - "3003:3003"
+    networks:
+      - mcp-network
+
+  # Fetch MCP (Node.js stdio -> HTTP proxy)
+  mcp-fetch:
+    build:
+      context: ./services/mcp-fetch
+      dockerfile: Dockerfile
+    environment:
+      - MCP_PORT=3004
+    ports:
+      - "3004:3004"
+    networks:
+      - mcp-network
+
+  # Web Search MCP (Python stdio -> HTTP proxy)
+  mcp-search:
+    build:
+      context: ./services/mcp-search
+      dockerfile: Dockerfile
+    environment:
+      - SEARCH_API_KEY=${SEARCH_API_KEY}
+      - MCP_PORT=3005
+    ports:
+      - "3005:3005"
+    networks:
+      - mcp-network
+
+  # Calculator MCP (Python stdio -> HTTP proxy)
+  mcp-calculator:
+    build:
+      context: ./services/mcp-calculator
+      dockerfile: Dockerfile
+    environment:
+      - MCP_PORT=3006
+    ports:
+      - "3006:3006"
+    networks:
+      - mcp-network
+
+  # Memory MCP (Node.js stdio -> HTTP proxy)
+  mcp-memory:
+    build:
+      context: ./services/mcp-memory
+      dockerfile: Dockerfile
+    environment:
+      - MCP_PORT=3007
+    ports:
+      - "3007:3007"
+    networks:
+      - mcp-network
+
+  # FastMCP Aggregator (combines all MCPs)
+  mcp-aggregator:
+    build:
+      context: ./services/mcp-aggregator
+      dockerfile: Dockerfile
+    environment:
+      - MCP_PORT=3100
+      - HOMEASSISTANT_URL=http://mcp-homeassistant:3001
+      - YNAB_URL=http://mcp-ynab:3002
+      - NOTION_URL=http://mcp-notion:3003
+      - FETCH_URL=http://mcp-fetch:3004
+      - SEARCH_URL=http://mcp-search:3005
+      - CALCULATOR_URL=http://mcp-calculator:3006
+      - MEMORY_URL=http://mcp-memory:3007
+    ports:
+      - "3100:3100"
+    networks:
+      - mcp-network
+
+  # MCPO (OpenAI tool server wrapper)
+  mcpo:
+    build:
+      context: ./services/mcpo
+      dockerfile: Dockerfile
+    environment:
+      - MCP_ENDPOINT=http://mcp-aggregator:3100
+      - PORT=8080
+    ports:
+      - "8080:8080"
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  mcp-data:

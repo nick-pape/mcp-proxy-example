@@ -1,0 +1,10 @@
+{
+  "name": "node-mcp-proxy",
+  "version": "1.0.0",
+  "description": "FastMCP stdio->HTTP proxy for Node.js MCP servers",
+  "main": "proxy.js",
+  "dependencies": {
+    "fastmcp": "^0.1.0",
+    "child_process": "^1.0.2"
+  }
+}

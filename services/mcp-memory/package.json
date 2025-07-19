@@ -1,0 +1,9 @@
+{
+  "name": "memory-mcp-proxy",
+  "version": "1.0.0",
+  "description": "FastMCP stdio->HTTP proxy for Memory MCP server",
+  "main": "proxy.js",
+  "dependencies": {
+    "fastmcp": "^0.1.0"
+  }
+}

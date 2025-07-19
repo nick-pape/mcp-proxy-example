@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Development version with only a few services for testing
+  mcp-calculator:
+    build:
+      context: ./services/mcp-calculator
+      dockerfile: Dockerfile
+    environment:
+      - MCP_PORT=3006
+    ports:
+      - "3006:3006"
+    networks:
+      - mcp-network
+
+  mcp-fetch:
+    build:
+      context: ./services/mcp-fetch
+      dockerfile: Dockerfile
+    environment:
+      - MCP_PORT=3004
+    ports:
+      - "3004:3004"
+    networks:
+      - mcp-network
+
+  mcp-memory:
+    build:
+      context: ./services/mcp-memory
+      dockerfile: Dockerfile
+    environment:
+      - MCP_PORT=3007
+    ports:
+      - "3007:3007"
+    networks:
+      - mcp-network
+
+  # Simple aggregator for testing
+  mcp-aggregator:
+    build:
+      context: ./services/mcp-aggregator
+      dockerfile: Dockerfile
+    environment:
+      - MCP_PORT=3100
+      - CALCULATOR_URL=http://mcp-calculator:3006
+      - FETCH_URL=http://mcp-fetch:3004
+      - MEMORY_URL=http://mcp-memory:3007
+    ports:
+      - "3100:3100"
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
