@@ -1,14 +1,17 @@
-FROM python:3.11-slim
+    FROM python:3.13-slim
 
-WORKDIR /app
+    WORKDIR /app
 
-# Install dependencies
-RUN pip install fastmcp uvicorn
+    # Install system dependencies including git
+    RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-# Install the YNAB MCP server
-RUN pip install git+https://github.com/ntdef/ynab-mcp.git
+    # Install dependencies
+    RUN pip install fastmcp uvicorn
 
-# Copy proxy script
+    # Install the YNAB MCP server
+    RUN pip install git+https://github.com/ntdef/ynab-mcp.git
+
+    # Copy proxy script
 COPY proxy.py /app/proxy.py
 
 ENV MCP_COMMAND="uv run ynab-mcp"

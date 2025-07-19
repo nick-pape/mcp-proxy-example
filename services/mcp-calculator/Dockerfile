@@ -2,20 +2,21 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies including uv
-RUN pip install fastmcp uvicorn && \
+# Install dependencies including uv and calculator MCP server
+RUN apt-get update && apt-get install -y curl && \
+    pip install fastmcp uvicorn && \
     curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    export PATH="/root/.local/bin:$PATH"
+    /root/.local/bin/uv tool install mcp-server-calculator && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install calculator MCP server
-RUN /root/.local/bin/uv tool install mcp-server-calculator
+# Add uv to PATH permanently
+ENV PATH="/root/.local/bin:$PATH"
 
 # Copy proxy script
 COPY proxy.py /app/proxy.py
 
 ENV MCP_COMMAND="uvx mcp-server-calculator"
 ENV MCP_PORT=3006
-ENV PATH="/root/.local/bin:$PATH"
 
 EXPOSE 3006
 

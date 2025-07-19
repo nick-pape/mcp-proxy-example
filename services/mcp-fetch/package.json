@@ -4,6 +4,6 @@
   "description": "FastMCP stdio->HTTP proxy for Fetch MCP server",
   "main": "proxy.js",
   "dependencies": {
-    "fastmcp": "^0.1.0"
+    "fastmcp": "^2.0.0"
   }
 }
