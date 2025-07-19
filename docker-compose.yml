@@ -103,13 +103,13 @@ services:
       dockerfile: Dockerfile
     environment:
       - MCP_PORT=3100
-      - HOMEASSISTANT_URL=http://mcp-homeassistant:3001
-      - YNAB_URL=http://mcp-ynab:3002
-      - NOTION_URL=http://mcp-notion:3003
-      - FETCH_URL=http://mcp-fetch:3004
-      - SEARCH_URL=http://mcp-search:3005
-      - CALCULATOR_URL=http://mcp-calculator:3006
-      - MEMORY_URL=http://mcp-memory:3007
+      - HOMEASSISTANT_URL=http://mcp-homeassistant:3001/mcp
+      - YNAB_URL=http://mcp-ynab:3002/mcp
+      - NOTION_URL=http://mcp-notion:3003/mcp
+      - FETCH_URL=http://mcp-fetch:3004/mcp
+      - SEARCH_URL=http://mcp-search:3005/mcp
+      - CALCULATOR_URL=http://mcp-calculator:3006/mcp
+      - MEMORY_URL=http://mcp-memory:3007/mcp
     ports:
       - "3100:3100"
     networks:

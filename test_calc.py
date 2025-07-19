@@ -6,7 +6,7 @@ from fastmcp import Client
 async def test_calculator():
     """Test the calculator MCP server"""
     
-    client = Client("http://localhost:8001/mcp/")
+    client = Client("http://172.19.96.1:3006/mcp/")
     
     try:
         async with client:
