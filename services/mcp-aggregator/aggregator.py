@@ -9,16 +9,22 @@ from fastmcp.server.proxy import ProxyClient
 # Get configuration from environment
 MCP_PORT = int(os.getenv('MCP_PORT', '3100'))
 
+def parse_mcp_servers():
+    """Parse MCP server configuration from environment variables"""
+    servers = {}
+    
+    # Parse from MCP_SERVERS env var (format: "name1:url1,name2:url2,...")
+    servers_env = os.getenv('MCP_SERVERS', '')
+    if servers_env:
+        for server_config in servers_env.split(','):
+            if ':' in server_config:
+                name, url = server_config.strip().split(':', 1)
+                servers[name.strip()] = url.strip()
+    
+    return servers
+
 # MCP server endpoints
-MCP_ENDPOINTS = {
-    #'homeassistant': os.getenv('HOMEASSISTANT_URL', 'http://mcp-homeassistant:3001/mcp'),
-    #'ynab': os.getenv('YNAB_URL', 'http://mcp-ynab:3002/mcp'),
-    #'notion': os.getenv('NOTION_URL', 'http://mcp-notion:3003/mcp'),
-    #'fetch': os.getenv('FETCH_URL', 'http://mcp-fetch:3004/mcp'),
-    #'search': os.getenv('SEARCH_URL', 'http://mcp-search:3005/mcp'),
-    'calculator': os.getenv('CALCULATOR_URL', 'http://mcp-calculator:3006/mcp'),
-    #'memory': os.getenv('MEMORY_URL', 'http://mcp-memory:3007/mcp'),
-}
+MCP_ENDPOINTS = parse_mcp_servers()
 
 # Create main FastMCP aggregator server
 mcp = FastMCP("MCP Aggregator")

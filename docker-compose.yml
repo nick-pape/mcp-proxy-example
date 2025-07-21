@@ -1,11 +1,22 @@
 version: '3.8'
 
+# Reusable templates for MCP services
+x-mcp-service: &mcp-service
+  networks:
+    - mcp-network
+  environment:
+    - MCP_PORT
+
+x-mcp-build: &mcp-build
+  dockerfile: Dockerfile
+
 services:
   # HomeAssistant MCP (Python stdio -> HTTP proxy)
   mcp-homeassistant:
+    <<: *mcp-service
     build:
+      <<: *mcp-build
       context: ./services/mcp-homeassistant
-      dockerfile: Dockerfile
     environment:
       - HASS_URL=${HASS_URL}
       - HASS_TOKEN=${HASS_TOKEN}
@@ -14,14 +25,13 @@ services:
       - SERVICE_NAME=HomeAssistant MCP
     ports:
       - "3001:3001"
-    networks:
-      - mcp-network
 
   # YNAB MCP (Python stdio -> HTTP proxy)
   mcp-ynab:
+    <<: *mcp-service
     build:
+      <<: *mcp-build
       context: ./services/mcp-ynab
-      dockerfile: Dockerfile
     environment:
       - YNAB_TOKEN=${YNAB_TOKEN}
       - MCP_COMMAND=uv run ynab-mcp
@@ -29,72 +39,65 @@ services:
       - SERVICE_NAME=YNAB MCP
     ports:
       - "3002:3002"
-    networks:
-      - mcp-network
 
   # Notion MCP (Python stdio -> HTTP proxy)
   mcp-notion:
+    <<: *mcp-service
     build:
+      <<: *mcp-build
       context: ./services/mcp-notion
-      dockerfile: Dockerfile
     environment:
       - NOTION_TOKEN=${NOTION_TOKEN}
       - MCP_PORT=3003
     ports:
       - "3003:3003"
-    networks:
-      - mcp-network
 
   # Fetch MCP (Node.js stdio -> HTTP proxy)
   mcp-fetch:
+    <<: *mcp-service
     build:
+      <<: *mcp-build
       context: ./services/mcp-fetch
-      dockerfile: Dockerfile
     environment:
       - MCP_PORT=3004
     ports:
       - "3004:3004"
-    networks:
-      - mcp-network
 
   # Web Search MCP (Python stdio -> HTTP proxy)
   mcp-search:
+    <<: *mcp-service
     build:
+      <<: *mcp-build
       context: ./services/mcp-search
-      dockerfile: Dockerfile
     environment:
       - SEARCH_API_KEY=${SEARCH_API_KEY}
       - MCP_PORT=3005
     ports:
       - "3005:3005"
-    networks:
-      - mcp-network
 
   # Calculator MCP (Python stdio -> HTTP proxy)
   mcp-calculator:
+    <<: *mcp-service
     build:
+      <<: *mcp-build
       context: ./services/mcp-calculator
-      dockerfile: Dockerfile
     environment:
       - MCP_COMMAND=uvx mcp-server-calculator
       - MCP_PORT=3006
       - SERVICE_NAME=Calculator MCP
     ports:
       - "3006:3006"
-    networks:
-      - mcp-network
 
   # Memory MCP (Node.js stdio -> HTTP proxy)
   mcp-memory:
+    <<: *mcp-service
     build:
+      <<: *mcp-build
       context: ./services/mcp-memory
-      dockerfile: Dockerfile
     environment:
       - MCP_PORT=3007
     ports:
       - "3007:3007"
-    networks:
-      - mcp-network
 
   # FastMCP Aggregator (combines all MCPs)
   mcp-aggregator:
@@ -103,13 +106,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - MCP_PORT=3100
-      - HOMEASSISTANT_URL=http://mcp-homeassistant:3001/mcp
-      - YNAB_URL=http://mcp-ynab:3002/mcp
-      - NOTION_URL=http://mcp-notion:3003/mcp
-      - FETCH_URL=http://mcp-fetch:3004/mcp
-      - SEARCH_URL=http://mcp-search:3005/mcp
-      - CALCULATOR_URL=http://mcp-calculator:3006/mcp
-      - MEMORY_URL=http://mcp-memory:3007/mcp
+      - MCP_SERVERS=homeassistant:http://mcp-homeassistant:3001/mcp,ynab:http://mcp-ynab:3002/mcp,notion:http://mcp-notion:3003/mcp,fetch:http://mcp-fetch:3004/mcp,search:http://mcp-search:3005/mcp,calculator:http://mcp-calculator:3006/mcp,memory:http://mcp-memory:3007/mcp
     ports:
       - "3100:3100"
     networks:
